@@ -1,0 +1,50 @@
+[tool.poetry]
+name = "python-exif-cleaner"
+version = "1.0.0"
+description = ""
+authors = ["mrKazzila <mrkazzila@gmail.com>"]
+readme = "README.md"
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pillow = "^10.0.0"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.0.289"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.ruff]
+show-fixes = true
+exclude = [".venv"]
+# Decrease the maximum line length to 79 characters.
+line-length = 120
+src = ["src"]
+select = [
+    # flake8-logging-format
+    "G001",
+    # Pyflakes
+    "F",
+    # Pycodestyle
+    "E",
+    "W",
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+    # flake8-annotations
+    "ANN",
+    # flake8-commas
+    "COM",
+    # flake8-comprehensions
+    "C4",
+]
+
+[tool.ruff.pydocstyle]
+convention = "google"
