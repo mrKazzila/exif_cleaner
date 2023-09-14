@@ -1,0 +1,24 @@
+# ===== base ignore =====
+__pypackages__/
+
+# ===== cache data ignore =====
+__pycache__/
+.ruff_cache
+.cache
+
+# ===== local environment ignore =====
+.venv
+.idea
+.DS_Store
+env/*
+!env/.env.example
+
+# ===== test data ignore =====
+.pytest_cache/
+cover/
+/htmlcov/
+.coverage
+.coverage.*
+
+# ===== project ignore =====
+*.json
