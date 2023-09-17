@@ -2,7 +2,6 @@ import logging
 import traceback as tb
 from collections.abc import Callable
 from functools import wraps
-from typing import NoReturn
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +17,7 @@ def exception_decorator(func: Callable) -> Callable:
         Callable: A wrapped function that handles exceptions.
     """
     @wraps(func)
-    def wrapper(*args: tuple, **kwargs: dict) -> NoReturn:
+    def wrapper(*args: tuple, **kwargs: dict) -> None:
         try:
             logger.debug('Start')
             func(*args, **kwargs)
