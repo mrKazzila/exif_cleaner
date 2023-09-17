@@ -1,14 +1,17 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeAlias
 
 from PIL import Image, ImageOps
 from PIL.ExifTags import TAGS
 from PIL.Image import Exif
+from pillow_heif import register_heif_opener
 from settings import FILES_FORMAT
 
 logger = logging.getLogger(__name__)
+register_heif_opener()
+ExifResultData: TypeAlias = dict[str, list[dict[str, str]]]
 
 
 def get_image_files_from_path(path: Path) -> list[Path]:
@@ -22,14 +25,13 @@ def get_image_files_from_path(path: Path) -> list[Path]:
         list[Path]: A list of Path objects representing the image files found.
     """
     images_path = [file for file in path.rglob('*') if file.is_file() and file.suffix.lower() in FILES_FORMAT]
-
     logger.info('Get %(images_path_len)s images from dir: %(path_name)s',
                 {'images_path_len': len(images_path), 'path_name': path.name})
 
     return images_path
 
 
-def check_exif_is_exist(images_path: list[Path]) -> dict[str, list[dict[str, str]]]:
+def check_exif_is_exist(images_path: list[Path]) -> ExifResultData:
     """
     Checks if exits are present in the provided list of image files.
 
