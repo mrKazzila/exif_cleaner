@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 IS_DEBUG = False
-FILES_FORMAT = ('.jpg', '.jpeg', '.png')
+FILES_FORMAT = ('.jpg', '.jpeg', '.png', '.heic')
 
 ROOT_DIR = Path(__file__).resolve().parent
 
