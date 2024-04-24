@@ -16,14 +16,19 @@ def exception_decorator(func: Callable) -> Callable:
     Returns:
         Callable: A wrapped function that handles exceptions.
     """
+
     @wraps(func)
     def wrapper(*args: tuple, **kwargs: dict) -> None:
         try:
-            logger.debug('Start')
+            logger.debug("Start")
             func(*args, **kwargs)
-            logger.debug('Done!')
+            logger.debug("Done!")
         except Exception as error:
-            trace = tb.format_exception(type(error), error, error.__traceback__)
-            logger.error('\n'.join(trace))
+            trace = tb.format_exception(
+                type(error),
+                error,
+                error.__traceback__,
+            )
+            logger.error("\n".join(trace))
 
     return wrapper

@@ -1,6 +1,8 @@
 import argparse
 from argparse import Namespace
 
+# TODO: make like pass_changer
+
 
 def get_params() -> Namespace:
     """
@@ -16,34 +18,34 @@ def get_params() -> Namespace:
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '-ifp',
-        '--image_folder_path',
+        "-ifp",
+        "--image_folder_path",
         type=str,
         required=True,
-        help='Path to images folder.',
+        help="Path to images folder.",
     )
     parser.add_argument(
-        '-rfp',
-        '--result_folder_path',
+        "-rfp",
+        "--result_folder_path",
         type=str,
         required=True,
-        help='Path to folder where save images without exif data.',
+        help="Path to folder where save images without exif data.",
     )
     parser.add_argument(
-        '-cj',
-        '--create_json',
+        "-cj",
+        "--create_json",
         type=bool,
         default=True,
         required=False,
-        help='Create Json file with exif image data.',
+        help="Create Json file with exif image data.",
     )
     parser.add_argument(
-        '-cle',
-        '--clean_exif',
+        "-cle",
+        "--clean_exif",
         type=bool,
         default=True,
         required=False,
-        help='Clean exif from images.',
+        help="Clean exif from images.",
     )
 
     args = parser.parse_args()
