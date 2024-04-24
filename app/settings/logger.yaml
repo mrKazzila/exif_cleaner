@@ -1,0 +1,32 @@
+version: 1
+disable_existing_loggers: false
+
+
+formatters:
+  my_stdout:
+    format: "%(asctime)s - %(levelname)s - %(module)s.%(funcName)s:%(lineno)d - %(message)s"
+
+
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: my_stdout
+
+  my_null:
+    class: logging.NullHandler
+
+
+loggers:
+  __main__:
+    handlers:
+      - console
+    level: DEBUG
+    propagate: false
+
+  app:
+    handlers:
+      - console
+    level: DEBUG
+    propagate: false
