@@ -31,23 +31,21 @@ class ExifCleaner:
         result_data = result["data"]
 
         with ProcessPoolExecutor() as executor:
-            to_do = {
+            futures = {
                 executor.submit(
-                    self._pop_metadata_from_image,
+                    self._process_image,
                     image_path,
                     result_folder / image_path.name,
                 )
                 for image_path in self.files
             }
 
-            [
+            for future in as_completed(futures):
                 result_data.append(future.result())
-                for future in as_completed(to_do)
-            ]
 
         return result if self.is_create_result_json else None
 
-    def _pop_metadata_from_image(
+    def _process_image(
         self,
         original_file_path: Path,
         new_file_path: Path,
@@ -71,51 +69,53 @@ class ExifCleaner:
         exif_data = None
 
         if self.is_create_result_json:
-            exif_data = self._get_exif_data_from_image(
-                image_object=image_object,
-                image_name=original_file_path.name,
+            exif_data = self._get_exif_data(
+                image_object,
+                original_file_path.name,
             )
 
-        self._rewrite_image_without_exif(
-            image_object=image_object,
-            new_file_path=new_file_path,
-        )
+        self._rewrite_image(image_object, new_file_path)
 
         image_object.close()
 
-        if self.is_create_result_json:
-            return exif_data
+        return exif_data
 
-    def _get_exif_data_from_image(
+    def _get_exif_data(
         self,
-        image_object: Image,
-        image_name: Path.name,
-    ):
-        if exif_data := image_object.getexif():
-            logger.debug("File: %s", image_name)
-            exif_tags = self._print_exif_tags(exif_data=exif_data)
-
-            return {
-                "file_name": image_name,
-                "exif_data": exif_tags,
-            }
-
-        logger.debug("Image %s contains no meta-information.", image_name)
-        return {
-            "file_name": image_name,
-            "exif_data": None,
-        }
-
-    @staticmethod
-    def _print_exif_tags(exif_data: Exif) -> dict[str, str]:
+        image_object: type[Image],
+        image_name: str,
+    ) -> dict[str, str]:
         """
-        Print EXIF metadata tags and their values.
+        Retrieve and format EXIF metadata from an image.
 
         Args:
-            exif_data (PIL.Image.Exif): The EXIF metadata.
+            image_object (Image): The image object.
+            image_name (str): The name of the image file.
 
         Returns:
-            dict
+            dict: Formatted EXIF metadata.
+        """
+        result = {"file_name": image_name}
+        exif_data = image_object.getexif()
+
+        if exif_data:
+            logger.debug("File: %s", image_name)
+            result["exif_data"] = self._format_exif_tags(exif_data=exif_data)
+            return result
+
+        logger.debug("Image %s contains no meta-information.", image_name)
+        return {"file_name": image_name, "exif_data": None}
+
+    @staticmethod
+    def _format_exif_tags(exif_data: Exif) -> dict[str, str]:
+        """
+        Format EXIF metadata into a dictionary.
+
+        Args:
+            exif_data (Exif): The EXIF metadata.
+
+        Returns:
+            dict: Formatted EXIF metadata.
         """
         return {
             str(TAGS.get(tag, tag)): str(value)
@@ -123,10 +123,14 @@ class ExifCleaner:
         }
 
     @staticmethod
-    def _rewrite_image_without_exif(
-        image_object: Image,
-        new_file_path: Path.name,
-    ):
+    def _rewrite_image(image_object: type[Image], new_file_path: Path) -> None:
+        """
+        Rewrite an image without its EXIF metadata.
+
+        Args:
+            image_object (Image): The image object.
+            new_file_path (Path): The path where the new image will be saved.
+        """
         original = ImageOps.exif_transpose(image_object)
         stripped = Image.new(original.mode, original.size)
 

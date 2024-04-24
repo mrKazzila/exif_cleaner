@@ -3,6 +3,8 @@ import traceback as tb
 from collections.abc import Callable
 from functools import wraps
 
+__all__ = ("exception_decorator",)
+
 logger = logging.getLogger(__name__)
 
 

@@ -2,110 +2,92 @@ import json
 import logging
 from functools import lru_cache
 from pathlib import Path
-from typing import TypeAlias
 
-from PIL import Image, ImageOps
-from pillow_heif import register_heif_opener
-
+from app.scr.helpers.types import ExifResultData
 from app.settings import FILES_FORMAT, ROOT_DIR
 
 logger = logging.getLogger(__name__)
-register_heif_opener()
-ExifResultData: TypeAlias = dict[str, list[dict[str, str]]]
 
 
 class FileManager:
     @classmethod
-    def get_image_files_from_path(cls, path: Path) -> list[Path]:
+    def get_image_files(cls, path: Path) -> list[Path]:
         """
-        Retrieves a list of image files from a given directory path.
+        Retrieve a list of image files from the specified directory.
 
         Args:
             path (Path): The directory path to search for image files.
 
         Returns:
-            list[Path]: A list of Path objects representing the image files found.
+            List[Path]: A list of Path objects representing the image files found.
         """
         images_path = [
             file
             for file in path.rglob("*")
             if file.is_file() and file.suffix.lower() in FILES_FORMAT
         ]
-        logger.info("Get %s images from dir: %s", len(images_path), path.name)
-
+        logger.info(
+            "Retrieved %s image(s) from directory: %s",
+            len(images_path),
+            path.name,
+        )
         return images_path
 
     @classmethod
     @lru_cache
-    def create_result_folder(cls, folder_name: Path) -> Path:
+    def create_result_folder(cls, folder_path: Path) -> Path:
         """
         Create a result folder if it doesn't exist.
 
-        Parameters:
-            folder_name (Path): Path to the folder.
+        Args:
+            folder_path (Path): The path to the folder to be created.
 
         Returns:
-            Path: Path to the created folder.
+            Path: The path to the created folder.
         """
-        if folder_name.exists() and folder_name.is_dir():
-            logger.warning("%s already exist!", folder_name)
-            return folder_name
+        if folder_path.exists() and folder_path.is_dir():
+            logger.warning("Folder '%s' already exists!", folder_path)
+            return folder_path
 
-        folder_name.mkdir(parents=True)
-        logger.info("%s: created!", folder_name)
-
-        return folder_name
+        folder_path.mkdir(parents=True)
+        logger.info("Folder '%s' created!", folder_path)
+        return folder_path
 
     @classmethod
-    def create_json_file_with_exif(cls, data: dict, file_path: Path) -> None:
+    def save_json_file(cls, data: ExifResultData, file_path: Path) -> None:
         """
-        Create a JSON file containing EXIF data.
+        Save data to a JSON file.
 
-        Parameters:
-            data (dict): Dictionary containing the EXIF data to be stored in the JSON file.
-            file_path (Path): Path to the JSON file.
+        Args:
+            data (Dict): The data to be saved to the JSON file.
+            file_path (Path): The path to the JSON file.
 
         Returns:
             None
         """
-        with open(file_path, "w", encoding="utf-8") as jf:
-            json.dump(data, jf, indent=3, ensure_ascii=False)
+        with open(file_path, "w", encoding="utf-8") as json_file:
+            json.dump(data, json_file, indent=3, ensure_ascii=False)
 
-        logger.info("Result file %s was created!", file_path)
+        logger.info("Result file '%s' created!", file_path)
 
     @classmethod
-    def create_path_for_result_json(cls, is_clean_exif, result_folder: Path):
+    def get_result_json_path(
+        cls,
+        is_clean_exif: bool,
+        result_folder: Path,
+    ) -> Path:
+        """
+        Get the path for the result JSON file.
+
+        Args:
+            is_clean_exif (bool): Indicates whether EXIF data is cleaned.
+            result_folder (Path): The path to the result folder.
+
+        Returns:
+            Path: The path to the result JSON file.
+        """
         return (
             ROOT_DIR / "result.json"
             if not is_clean_exif
             else result_folder / "result.json"
         )
-
-    @classmethod
-    def _rewrite_image_without_metadata(
-        cls,
-        original_file_path: Path,
-        new_file_path: Path,
-    ) -> None:
-        """
-        Rewrite an image without its metadata.
-
-        Args:
-            original_file_path (Path): The path to the original image file.
-            new_file_path (Path): The path where the new image will be saved.
-        """
-        try:
-            original = Image.open(original_file_path)
-        except OSError as e:
-            logger.error(
-                "ERROR: Problem reading image file %s.",
-                original_file_path.name,
-            )
-            raise e
-
-        original = ImageOps.exif_transpose(original)
-        stripped = Image.new(original.mode, original.size)
-
-        data = list(original.getdata())
-        stripped.putdata(data)
-        stripped.save(new_file_path)

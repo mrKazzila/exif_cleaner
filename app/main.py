@@ -8,55 +8,59 @@ logger_setup()
 logger = logging.getLogger(__name__)
 
 
-@exception_decorator
-def main(
-    folder_with_images: Path,
-    folder_for_images_without_exif: Path,
-    is_clean_exif: bool,
-    is_create_result_json: bool,
+def process_images(
+    image_folder: Path,
+    result_folder: Path,
+    clean_exif: bool,
+    create_json: bool,
 ) -> None:
     """
-    Main function to process image files in the specified directory.
+    Process image files in the specified directory.
 
     Parameters:
-        folder_with_images (Path): Path to the folder containing the images.
-        folder_for_images_without_exif (Path): Path to the folder
-        where images without EXIF data will be saved.
-        is_clean_exif (bool): Indicates whether to clean EXIF data from images.
-        is_create_result_json (bool): Indicates whether to create a JSON file with EXIF data.
+        image_folder (Path): Path to the folder containing the images.
+        result_folder (Path): Path to the folder where images without EXIF data will be saved.
+        clean_exif (bool): Indicates whether to clean EXIF data from images.
+        create_json (bool): Indicates whether to create a JSON file with EXIF data.
 
     Returns:
         None
     """
-    images_path = Services.get_image_files_from_path(
-        path=folder_with_images,
-    )
-    result_folder = Services.create_result_folder(
-        name=folder_for_images_without_exif,
-    )
+    images_path = Services.get_image_files(path=image_folder)
+    result_folder = Services.create_result_folder(name=result_folder)
     exif_data = Services.clean_exif(
         image_files=images_path,
-        result_dock=is_create_result_json,
+        create_json=create_json,
         result_folder=result_folder,
     )
 
     Services.create_json_file_with_exif(
         exif_data=exif_data,
-        is_clean_exif=is_clean_exif,
+        is_clean_exif=clean_exif,
         result_folder=result_folder,
     )
 
 
-if __name__ == "__main__":
-    input_params_for_script = get_params()
+@exception_decorator
+def main() -> None:
+    """
+    Main function to process image files with specified parameters.
 
-    main(
-        folder_with_images=Path(
-            input_params_for_script.image_folder_path,
-        ).resolve(),
-        folder_for_images_without_exif=Path(
-            input_params_for_script.result_folder_path,
-        ).resolve(),
-        is_clean_exif=input_params_for_script.clean_exif,
-        is_create_result_json=input_params_for_script.create_json,
+    Returns:
+        None
+    """
+    input_params = get_params()
+
+    image_folder = Path(input_params.image_folder_path).resolve()
+    result_folder = Path(input_params.result_folder_path).resolve()
+
+    process_images(
+        image_folder=image_folder,
+        result_folder=result_folder,
+        clean_exif=input_params.clean_exif,
+        create_json=input_params.create_json,
     )
+
+
+if __name__ == "__main__":
+    main()
