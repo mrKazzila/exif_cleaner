@@ -9,52 +9,117 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 pillow = "^10.0.0"
+pillow-heif = "^0.13.0"
+pyyaml = "^6.0.1"
 
 
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.0.289"
-
+[tool.poetry.group.linter.dependencies]
+ruff = "^0.4.1"
+pyright = "^1.1.360"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 
-[tool.ruff]
-show-fixes = true
-line-length = 120
-src = ["src"]
-exclude = [
-    ".venv",
-    ".git",
-    ".ruff_cache",
-]
-select = [
-    "G001",                 # flake8-logging-format
-    "F",                    # Pyflakes
-    "E", "W",               # Pycodestyle
-    "I",                    # isort
-    "N",                    # pep8-naming
-    "ANN",                  # flake8-annotations
-    "COM",                  # flake8-commas
-    "C4",                   # flake8-comprehensions
-    "Q",                    # flake8-quotes
-    "D101", "D102", "D103", # pydocstyle
-    "D201", "D202", "D204",
-    "D213", "D300", "D419",
-]
-ignore = []
 
-[tool.ruff.pydocstyle]
-convention = "google"
+# ==========================
+# ===== TOOLS SETTINGS =====
+# ==========================
+[tool.pytest.ini_options]
+# https://docs.pytest.org/en/7.3.x/reference/customize.html
+addopts = "-v -rA -p no:warnings"
+testpaths = [
+    "tests",
+]
+
+markers = [
+    "unit: Suite of unit tests",
+    "integration: Suite of integration tests",
+    "e2e: Suite of e2e tests"
+]
+
+
+[tool.ruff]
+# https://docs.astral.sh/ruff/
+respect-gitignore = true
+line-length = 79
+target-version = "py311"
+src = ["app"]
+fixable = ["ALL"]
+
+select = [
+    "I",       # isort
+    "A",       # flake8-builtins
+    "F",       # Pyflakes
+    "E", "W",  # Pycodestyle
+    "N",       # pep8-naming
+    "Q",       # flake8-quotes
+    "UP",      # pyupgrade
+    "PT",      # flake8-pytest-style
+    "C4",      # flake8-comprehensions
+    "ERA",     # eradicate
+    "RET",     # flake8-return
+    "ARG",     # flake8-unused-arguments
+    "PTH",     # flake8-use-pathlib
+    "FLY",     # flynt
+    "ANN",     # flake8-annotations
+    "COM",     # flake8-commas
+    "G001",    # flake8-logging-format
+]
+
+ignore = [
+    "ANN002",  # Missing type annotation for *{name}
+    "ANN003",  # Missing type annotation for **{name}
+    "ANN101",  # Missing type annotation for {name} in method
+    "ANN102",  # Missing type annotation for {name} in classmethod
+    "ANN401",  # Dynamically typed expressions (typing.Any)
+    "PT007",   # Wrong values type in `@pytest.mark.parametrize` expected `list` of `tuple`
+]
+
+[tool.ruff.format]
+skip-magic-trailing-comma = false
+quote-style = "double"
+indent-style = "space"
 
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["E402"]
 
-[tool.ruff.flake8-quotes]
-docstring-quotes = "double"
-inline-quotes = "single"
-multiline-quotes = "double"
+[tool.ruff.isort]
+split-on-trailing-comma = true
+combine-as-imports = true
+lines-after-imports = 1
+lines-between-types = 0
+known-local-folder = [
+    "app",
+]
 
-[tool.ruff.flake8-annotations]
-allow-star-arg-any = true
+[tool.ruff.flake8-quotes]
+inline-quotes = "double"
+multiline-quotes = "double"
+docstring-quotes = "double"
+
+
+[tool.pyright]
+# https://pypi.org/project/pyright/
+include = ["app"]
+venv = ".venv"
+pythonVersion = "3.11"
+
+exclude = [
+    "**/__pycache__"
+]
+
+[tool.pyright.types]
+reportMissingTypeStubs = false
+reportMissingImports = false
+
+[tool.pyright.variables]
+reportUnusedVariable = "error"
+reportMissingParameterType = "warning"
+
+[tool.pyright.imports]
+reportImportCycles = "error"
+reportUnusedImport = "warning"
+reportDuplicateImport = "warning"
+reportAssertAlwaysTrue = "warning"
