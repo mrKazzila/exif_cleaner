@@ -11,12 +11,6 @@ logger = logging.getLogger(__name__)
 def exception_decorator(func: Callable) -> Callable:
     """
     A decorator that wraps a function and handles exceptions.
-
-    Args:
-        func (Callable): The function to be decorated.
-
-    Returns:
-        Callable: A wrapped function that handles exceptions.
     """
 
     @wraps(func)

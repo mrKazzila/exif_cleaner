@@ -6,21 +6,15 @@ from pathlib import Path
 from app.scr.helpers.types import ExifResultData
 from app.settings import FILES_FORMAT, ROOT_DIR
 
+__all__ = ("FileManager",)
+
 logger = logging.getLogger(__name__)
 
 
 class FileManager:
     @classmethod
     def get_image_files(cls, path: Path) -> list[Path]:
-        """
-        Retrieve a list of image files from the specified directory.
-
-        Args:
-            path (Path): The directory path to search for image files.
-
-        Returns:
-            List[Path]: A list of Path objects representing the image files found.
-        """
+        """Retrieve a list of image files from the specified directory."""
         images_path = [
             file
             for file in path.rglob("*")
@@ -36,15 +30,7 @@ class FileManager:
     @classmethod
     @lru_cache
     def create_result_folder(cls, folder_path: Path) -> Path:
-        """
-        Create a result folder if it doesn't exist.
-
-        Args:
-            folder_path (Path): The path to the folder to be created.
-
-        Returns:
-            Path: The path to the created folder.
-        """
+        """Create a result folder if it doesn't exist."""
         if folder_path.exists() and folder_path.is_dir():
             logger.warning("Folder '%s' already exists!", folder_path)
             return folder_path
@@ -55,16 +41,7 @@ class FileManager:
 
     @classmethod
     def save_json_file(cls, data: ExifResultData, file_path: Path) -> None:
-        """
-        Save data to a JSON file.
-
-        Args:
-            data (Dict): The data to be saved to the JSON file.
-            file_path (Path): The path to the JSON file.
-
-        Returns:
-            None
-        """
+        """Save data to a JSON file."""
         with open(file_path, "w", encoding="utf-8") as json_file:
             json.dump(data, json_file, indent=3, ensure_ascii=False)
 
@@ -76,16 +53,7 @@ class FileManager:
         is_clean_exif: bool,
         result_folder: Path,
     ) -> Path:
-        """
-        Get the path for the result JSON file.
-
-        Args:
-            is_clean_exif (bool): Indicates whether EXIF data is cleaned.
-            result_folder (Path): The path to the result folder.
-
-        Returns:
-            Path: The path to the result JSON file.
-        """
+        """Get the path for the result JSON file."""
         return (
             ROOT_DIR / "result.json"
             if not is_clean_exif

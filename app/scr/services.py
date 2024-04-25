@@ -3,6 +3,8 @@ from pathlib import Path
 
 from app.scr.helpers import ExifCleaner, ExifResultData, FileManager
 
+__all__ = ("Services",)
+
 logger = logging.getLogger(__name__)
 
 

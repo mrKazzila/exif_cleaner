@@ -7,6 +7,7 @@ from sys import exit
 import yaml
 
 __all__ = ("logger_setup",)
+
 logger = logging.getLogger(__name__)
 
 

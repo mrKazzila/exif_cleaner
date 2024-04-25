@@ -9,6 +9,8 @@ from pillow_heif import register_heif_opener
 
 from app.scr.helpers.types import ExifResultData
 
+__all__ = ("ExifCleaner",)
+
 logger = logging.getLogger(__name__)
 register_heif_opener()
 
@@ -23,9 +25,6 @@ class ExifCleaner:
     def clean_exif(self, result_folder: Path) -> ExifResultData | None:
         """
         Cleans the EXIF metadata from the provided list of image files.
-
-        Args:
-            result_folder (Path): Folder for images without exif.
         """
         result = {"data": []}
         result_data = result["data"]
@@ -50,13 +49,7 @@ class ExifCleaner:
         original_file_path: Path,
         new_file_path: Path,
     ):
-        """
-        Rewrite an image without its metadata.
-
-        Args:
-            original_file_path (Path): The path to the original image file.
-            new_file_path (Path): The path where the new image will be saved.
-        """
+        """Rewrite an image without its metadata."""
         try:
             image_object = Image.open(original_file_path)
         except OSError as error:
@@ -85,16 +78,7 @@ class ExifCleaner:
         image_object: type[Image],
         image_name: str,
     ) -> dict[str, str]:
-        """
-        Retrieve and format EXIF metadata from an image.
-
-        Args:
-            image_object (Image): The image object.
-            image_name (str): The name of the image file.
-
-        Returns:
-            dict: Formatted EXIF metadata.
-        """
+        """Retrieve and format EXIF metadata from an image."""
         result = {"file_name": image_name}
         exif_data = image_object.getexif()
 
@@ -108,15 +92,7 @@ class ExifCleaner:
 
     @staticmethod
     def _format_exif_tags(exif_data: Exif) -> dict[str, str]:
-        """
-        Format EXIF metadata into a dictionary.
-
-        Args:
-            exif_data (Exif): The EXIF metadata.
-
-        Returns:
-            dict: Formatted EXIF metadata.
-        """
+        """Format EXIF metadata into a dictionary."""
         return {
             str(TAGS.get(tag, tag)): str(value)
             for tag, value in exif_data.items()
@@ -124,13 +100,7 @@ class ExifCleaner:
 
     @staticmethod
     def _rewrite_image(image_object: type[Image], new_file_path: Path) -> None:
-        """
-        Rewrite an image without its EXIF metadata.
-
-        Args:
-            image_object (Image): The image object.
-            new_file_path (Path): The path where the new image will be saved.
-        """
+        """Rewrite an image without its EXIF metadata."""
         original = ImageOps.exif_transpose(image_object)
         stripped = Image.new(original.mode, original.size)
 
