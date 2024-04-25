@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from app.scr import Services, exception_decorator, get_params
+from app.scr import Services, exception_decorator, get_options
 from app.settings import logger_setup
 
 logger_setup()
@@ -45,14 +45,11 @@ def process_images(
 def main() -> None:
     """
     Main function to process image files with specified parameters.
-
-    Returns:
-        None
     """
-    input_params = get_params()
+    input_params = get_options()
 
-    image_folder = Path(input_params.image_folder_path).resolve()
-    result_folder = Path(input_params.result_folder_path).resolve()
+    image_folder = Path(input_params.input_folder).resolve()
+    result_folder = Path(input_params.output_folder).resolve()
 
     process_images(
         image_folder=image_folder,
