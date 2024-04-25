@@ -39,7 +39,7 @@ To clone and run this project, you'll need:
 
 1. Firstly clone repo
    ```bash
-   git clone git@github.com:mrKazzila/python_dev_test_task.git
+   git clone git@github.com:mrKazzila/python_cli_exif_cleaner.git
    ```
 
 2. Setup poetry
@@ -56,18 +56,18 @@ To clone and run this project, you'll need:
 
 **Parameters**
 
-| Parameter              | Type   | Description                                         | Required | Default value |
-|------------------------|--------|-----------------------------------------------------|----------|---------------|
-| `--image_folder_path`  | `str`  | Path to images folder.                              | True     | -             |
-| `--result_folder_path` | `str`  | Path to folder where save images without exif data. | True     | -             |
-| `--create_json`        | `bool` | Create Json file with exif image data.              | False    | True          |
-| `--clean_exif`         | `bool` | Clean exif from images.                             | False    | True          |
+| Parameter          | Type   | Description                                         | Required | Default value |
+|--------------------|--------|-----------------------------------------------------|----------|---------------|
+| `--input-folder`   | `str`  | Path to images folder.                              | True     | -             |
+| `--output-folder`  | `str`  | Path to folder where save images without exif data. | True     | -             |
+| `--create-json`    | `bool` | Create Json file with exif image data.              | False    | True          |
+| `--clean-exif`     | `bool` | Clean exif from images.                             | False    | True          |
 
 
 **Examples**
 
    ```bash
-    python main.py -ifp photo -rfp photo2
+    python main.py -i pictures -o pictures
    ```
 
 
