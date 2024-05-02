@@ -2,7 +2,7 @@ import argparse
 from argparse import ArgumentParser, Namespace
 from collections import namedtuple
 
-__all__ = {"get_options"}
+__all__ = ("get_options",)
 
 arg_param = namedtuple(
     "Params",
@@ -30,7 +30,7 @@ def get_options() -> Namespace:
     return parser.parse_args()
 
 
-def _add_options(parser: ArgumentParser) -> ArgumentParser:
+def _add_options(*, parser: ArgumentParser) -> ArgumentParser:
     _args = (
         arg_param(
             "-i",
