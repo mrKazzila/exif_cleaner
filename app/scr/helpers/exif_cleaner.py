@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
@@ -7,7 +8,7 @@ from PIL.ExifTags import TAGS
 from PIL.Image import Exif
 from pillow_heif import register_heif_opener
 
-from app.scr.helpers.types import ExifResultData
+from app.scr.helpers.types import ExifResultData, FileExifData
 
 __all__ = ("ExifCleaner",)
 
@@ -18,11 +19,11 @@ register_heif_opener()
 class ExifCleaner:
     __slots__ = ("files", "is_create_result_json")
 
-    def __init__(self, files: list[Path], is_create_result_json):
+    def __init__(self, *, files: list[Path], is_create_result_json):
         self.files = files
         self.is_create_result_json = is_create_result_json
 
-    def clean_exif(self, result_folder: Path) -> ExifResultData | None:
+    def clean_exif(self, *, result_folder: Path) -> ExifResultData | None:
         """
         Cleans the EXIF metadata from the provided list of image files.
         """
@@ -39,8 +40,10 @@ class ExifCleaner:
                 for image_path in self.files
             }
 
-            for future in as_completed(futures):
+            [
                 result_data.append(future.result())
+                for future in as_completed(futures)
+            ]
 
         return result if self.is_create_result_json else None
 
@@ -48,26 +51,30 @@ class ExifCleaner:
         self,
         original_file_path: Path,
         new_file_path: Path,
-    ):
+    ) -> FileExifData | None:
         """Rewrite an image without its metadata."""
         try:
-            image_object = Image.open(original_file_path)
-        except OSError as error:
+            image_object: Image.Image = Image.open(original_file_path)
+        except OSError as error_:
             logger.error(
-                "ERROR: Problem reading image file %s.",
+                "Error when reading image file %s: %s",
                 original_file_path.name,
+                error_,
             )
-            raise error
+            raise error_
 
         exif_data = None
 
         if self.is_create_result_json:
             exif_data = self._get_exif_data(
-                image_object,
-                original_file_path.name,
+                image_object=image_object,
+                image_name=original_file_path.name,
             )
 
-        self._rewrite_image(image_object, new_file_path)
+        self._rewrite_image(
+            image_object=image_object,
+            new_file_path=new_file_path,
+        )
 
         image_object.close()
 
@@ -75,23 +82,37 @@ class ExifCleaner:
 
     def _get_exif_data(
         self,
-        image_object: type[Image],
+        *,
+        image_object: Image.Image,
         image_name: str,
-    ) -> dict[str, str]:
+    ) -> FileExifData:
         """Retrieve and format EXIF metadata from an image."""
-        result = {"file_name": image_name}
-        exif_data = image_object.getexif()
+        try:
+            if exif_data := image_object.getexif():
+                logger.debug("File: %s", image_name)
+                return FileExifData(
+                    file_name=image_name,
+                    exif_tags=self._format_exif_tags(exif_data=exif_data),
+                )
 
-        if exif_data:
-            logger.debug("File: %s", image_name)
-            result["exif_data"] = self._format_exif_tags(exif_data=exif_data)
-            return result
-
-        logger.debug("Image %s contains no meta-information.", image_name)
-        return {"file_name": image_name, "exif_data": None}
+            logger.debug("Image %s contains no meta-information", image_name)
+            return FileExifData(
+                file_name=image_name,
+                exif_tags=None,
+            )
+        except OSError as error_:
+            logger.error(
+                "Error when retrieving exif data for a file %s: %s",
+                image_name,
+                error_,
+            )
+            return FileExifData(
+                file_name=image_name,
+                exif_tags=None,
+            )
 
     @staticmethod
-    def _format_exif_tags(exif_data: Exif) -> dict[str, str]:
+    def _format_exif_tags(*, exif_data: Exif) -> dict[str, str]:
         """Format EXIF metadata into a dictionary."""
         return {
             str(TAGS.get(tag, tag)): str(value)
@@ -99,12 +120,22 @@ class ExifCleaner:
         }
 
     @staticmethod
-    def _rewrite_image(image_object: type[Image], new_file_path: Path) -> None:
+    def _rewrite_image(
+        *,
+        image_object: Image.Image,
+        new_file_path: Path,
+    ) -> None:
         """Rewrite an image without its EXIF metadata."""
-        original = ImageOps.exif_transpose(image_object)
-        stripped = Image.new(original.mode, original.size)
+        try:
+            if original := ImageOps.exif_transpose(image_object):
+                _data = original.getdata()
 
-        data = list(original.getdata())
-        stripped.putdata(data)
+                if isinstance(_data, Sequence):
+                    data = list(_data)
 
-        stripped.save(new_file_path)
+                    stripped = Image.new(original.mode, original.size)
+                    stripped.putdata(data)
+                    stripped.save(new_file_path)
+
+        except OSError as error_:
+            logger.error("Error when overwriting an image file: %s", error_)
