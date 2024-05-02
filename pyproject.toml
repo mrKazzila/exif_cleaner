@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "python-exif-cleaner"
+name = "exif-cleaner"
 version = "1.0.0"
-description = ""
+description = "Clean exif data from the images."
 authors = ["mrKazzila <mrkazzila@gmail.com>"]
 readme = "README.md"
 
@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 pillow = "^10.0.0"
-pillow-heif = "^0.13.0"
+pillow-heif = "^0.16.0"
 pyyaml = "^6.0.1"
 
 
