@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def process_images(
+    *,
     image_folder: Path,
     result_folder: Path,
     clean_exif: bool,
