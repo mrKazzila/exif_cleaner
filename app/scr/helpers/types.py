@@ -1,5 +1,11 @@
-from typing import TypeAlias
+from typing import TypeAlias, TypedDict
 
-__all__ = ("ExifResultData",)
+__all__ = ("ExifResultData", "FileExifData")
 
-ExifResultData: TypeAlias = dict[str, list[dict[str, str]]]
+
+class FileExifData(TypedDict):
+    file_name: str
+    exif_tags: dict[str, str] | None
+
+
+ExifResultData: TypeAlias = dict[str, list[FileExifData | None]]
