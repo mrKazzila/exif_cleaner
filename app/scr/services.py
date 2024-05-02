@@ -10,22 +10,23 @@ logger = logging.getLogger(__name__)
 
 class Services:
     @classmethod
-    def get_image_files(cls, path: Path) -> list[Path]:
+    def get_image_files(cls, *, path: Path) -> list[Path]:
         """Retrieve image files from the specified path."""
         return FileManager.get_image_files(path=path)
 
     @classmethod
-    def create_result_folder(cls, name: Path) -> Path:
+    def create_result_folder(cls, *, name: Path) -> Path:
         """Create a result folder with the specified name."""
         return FileManager.create_result_folder(folder_path=name)
 
     @classmethod
     def clean_exif(
         cls,
+        *,
         image_files: list[Path],
         create_json: bool,
         result_folder: Path,
-    ) -> ExifResultData:
+    ) -> ExifResultData | None:
         """Clean EXIF data from image files."""
         cleaner = ExifCleaner(
             files=image_files,
@@ -36,7 +37,8 @@ class Services:
     @classmethod
     def create_json_file_with_exif(
         cls,
-        exif_data: ExifResultData,
+        *,
+        exif_data: ExifResultData | None,
         is_clean_exif: bool,
         result_folder: Path,
     ) -> None:
