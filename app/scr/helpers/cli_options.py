@@ -1,4 +1,3 @@
-import argparse
 from argparse import ArgumentParser, Namespace
 from collections import namedtuple
 
@@ -21,7 +20,7 @@ def get_options() -> Namespace:
             - create_json (bool): Create Json file with exif image data.
             - clean_exif (bool): Clean exif from images.
     """
-    _parser = argparse.ArgumentParser(
+    _parser = ArgumentParser(
         description="Your program description here.",
     )
 
