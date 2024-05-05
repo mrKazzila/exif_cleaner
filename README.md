@@ -39,7 +39,7 @@ To clone and run this project, you'll need:
 
 1. Firstly clone repo
    ```bash
-   git clone git@github.com:mrKazzila/python_cli_exif_cleaner.git
+   git clone git@github.com:mrKazzila/exif_cleaner.git
    ```
 
 2. Setup poetry
