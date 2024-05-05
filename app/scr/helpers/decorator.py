@@ -19,11 +19,11 @@ def exception_decorator(func: Callable) -> Callable:
             logger.debug("Start")
             func(*args, **kwargs)
             logger.debug("Done!")
-        except Exception as error:
+        except Exception as error_:
             trace = tb.format_exception(
-                type(error),
-                error,
-                error.__traceback__,
+                type(error_),
+                error_,
+                error_.__traceback__,
             )
             logger.error("\n".join(trace))
 
