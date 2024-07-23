@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from cleaner.settings import logger_setup
-from cleaner.src import process_images, exception_decorator, get_options
+from cleaner.src import exception_decorator, get_options, process_images
 
 
 @exception_decorator
