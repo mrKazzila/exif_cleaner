@@ -2,13 +2,14 @@ import logging
 from collections.abc import Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
+from time import perf_counter
 
 from PIL import Image, ImageOps
 from PIL.ExifTags import TAGS
 from PIL.Image import Exif
 from pillow_heif import register_heif_opener
 
-from app.scr.helpers.types import ExifResultData, FileExifData
+from cleaner.src.helpers.types import ExifResultData, FileExifData
 
 __all__ = ("ExifCleaner",)
 
@@ -27,8 +28,11 @@ class ExifCleaner:
         """
         Cleans the EXIF metadata from the provided list of image files.
         """
+        start_time = perf_counter()
+
         result = {"data": []}
         result_data = result["data"]
+        result_time = result["time"]
 
         with ProcessPoolExecutor() as executor:
             futures = {
@@ -44,6 +48,8 @@ class ExifCleaner:
                 result_data.append(future.result())
                 for future in as_completed(futures)
             ]
+
+        result_time["time"] = perf_counter() - start_time
 
         return result if self.is_create_result_json else None
 
@@ -89,13 +95,13 @@ class ExifCleaner:
         """Retrieve and format EXIF metadata from an image."""
         try:
             if exif_data := image_object.getexif():
-                logger.debug("File: %s", image_name)
+                logger.info("File: %s", image_name)
                 return FileExifData(
                     file_name=image_name,
                     exif_tags=self._format_exif_tags(exif_data=exif_data),
                 )
 
-            logger.debug("Image %s contains no meta-information", image_name)
+            logger.info("Image %s contains no meta-information", image_name)
             return FileExifData(
                 file_name=image_name,
                 exif_tags=None,
@@ -129,13 +135,11 @@ class ExifCleaner:
         try:
             if original := ImageOps.exif_transpose(image_object):
                 _data = original.getdata()
+                data = list(_data)
 
-                if isinstance(_data, Sequence):
-                    data = list(_data)
-
-                    stripped = Image.new(original.mode, original.size)
-                    stripped.putdata(data)
-                    stripped.save(new_file_path)
+                stripped = Image.new(original.mode, original.size)
+                stripped.putdata(data)
+                stripped.save(new_file_path)
 
         except OSError as error_:
             logger.error("Error when overwriting an image file: %s", error_)
