@@ -2,14 +2,14 @@
 
 
 # ===== Linters & Formatter automation =====
-format:
+lint:
 	@echo "Start linters ..."
 	- ruff check --fix --silent .
 	- ruff format --silent .
 	@echo "Linters done!"
 
 
-lint:
+hint:
     @echo "Start pyright ..."
-    - pyright app
+    - pyright src
     @echo "Pyright done!"
