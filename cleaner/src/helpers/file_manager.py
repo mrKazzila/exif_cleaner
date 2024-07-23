@@ -3,8 +3,8 @@ import logging
 from functools import lru_cache
 from pathlib import Path
 
-from cleaner.src.helpers.types import ExifResultData
 from cleaner.settings import FILES_FORMAT, ROOT_DIR
+from cleaner.src.helpers.types import ExifResultData
 
 __all__ = ("FileManager",)
 

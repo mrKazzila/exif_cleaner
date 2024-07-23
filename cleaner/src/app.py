@@ -2,7 +2,6 @@ from pathlib import Path
 
 from cleaner.src.services import Services
 
-
 __all__ = ("process_images",)
 
 
