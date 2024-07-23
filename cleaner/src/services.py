@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from app.scr.helpers import ExifCleaner, ExifResultData, FileManager
+from cleaner.src.helpers import ExifCleaner, ExifResultData, FileManager
 
 __all__ = ("Services",)
 

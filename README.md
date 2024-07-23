@@ -51,7 +51,7 @@ To clone and run this project, you'll need:
 
 3. Run script
    ```bash
-   python main.py [OPTIONS]
+   python app.py [OPTIONS]
    ```
 
 **Parameters**
@@ -67,7 +67,7 @@ To clone and run this project, you'll need:
 **Examples**
 
    ```bash
-    python main.py -i pictures -o pictures
+    python app.py -i pictures -o pictures
    ```
 
 

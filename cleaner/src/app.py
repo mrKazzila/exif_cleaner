@@ -1,11 +1,9 @@
-import logging
 from pathlib import Path
 
-from app.scr import Services, exception_decorator, get_options
-from app.settings import logger_setup
+from cleaner.src.services import Services
 
-logger_setup()
-logger = logging.getLogger(__name__)
+
+__all__ = ("process_images",)
 
 
 def process_images(
@@ -29,6 +27,7 @@ def process_images(
     """
     images_path = Services.get_image_files(path=image_folder)
     result_folder = Services.create_result_folder(name=result_folder)
+
     exif_data = Services.clean_exif(
         image_files=images_path,
         create_json=create_json,
@@ -40,25 +39,3 @@ def process_images(
         is_clean_exif=clean_exif,
         result_folder=result_folder,
     )
-
-
-@exception_decorator
-def main() -> None:
-    """
-    Main function to process image files with specified parameters.
-    """
-    input_params = get_options()
-
-    image_folder = Path(input_params.input_folder).resolve()
-    result_folder = Path(input_params.output_folder).resolve()
-
-    process_images(
-        image_folder=image_folder,
-        result_folder=result_folder,
-        clean_exif=input_params.clean_exif,
-        create_json=input_params.create_json,
-    )
-
-
-if __name__ == "__main__":
-    main()
