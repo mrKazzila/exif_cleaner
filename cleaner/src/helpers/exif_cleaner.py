@@ -29,9 +29,12 @@ class ExifCleaner:
         """
         start_time = perf_counter()
 
-        result = {"data": []}
+        result = {
+            "time": None,
+            "count": 0,
+            "data": [],
+        }
         result_data = result["data"]
-        result_time = result["time"]
 
         with ProcessPoolExecutor() as executor:
             futures = {
@@ -48,7 +51,8 @@ class ExifCleaner:
                 for future in as_completed(futures)
             ]
 
-        result_time["time"] = perf_counter() - start_time
+        result["time"] = round((perf_counter() - start_time), 3)
+        result["count"] = len(result_data)
 
         return result if self.is_create_result_json else None
 
